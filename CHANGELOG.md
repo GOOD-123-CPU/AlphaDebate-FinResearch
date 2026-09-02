@@ -53,6 +53,6 @@
 - 移除全部硬编码 API Key 与内网服务器路径
 - 572MB 完整训练集不入库（保留 4 个分项子集）
 
-[Unreleased]: https://github.com/<your-org>/finsightpro/compare/v2.1.0...HEAD
-[2.1.0]: https://github.com/<your-org>/finsightpro/compare/v2.0.0...v2.1.0
-[2.0.0]: https://github.com/<your-org>/finsightpro/releases/tag/v2.0.0
+[Unreleased]: https://github.com/GOOD-123-CPU/finsightpro/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/GOOD-123-CPU/finsightpro/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/GOOD-123-CPU/finsightpro/releases/tag/v2.0.0
