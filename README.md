@@ -60,7 +60,7 @@ flowchart LR
 ## 🚀 快速开始
 
 ```bash
-git clone https://github.com/GOOD-123-CPU/finsightpro.git
+git clone https://github.com/GOOD-123-CPU/AlphaDebate-FinResearch.git
 cd finsightpro
 pip install -r requirements.txt
 

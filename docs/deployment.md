@@ -5,7 +5,7 @@
 ### 1. 克隆与安装
 
 ```bash
-git clone https://github.com/GOOD-123-CPU/finsightpro.git
+git clone https://github.com/GOOD-123-CPU/AlphaDebate-FinResearch.git
 cd finsightpro
 pip install -r requirements.txt
 ```
