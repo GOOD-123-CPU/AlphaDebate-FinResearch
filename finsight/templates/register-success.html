@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册成功页面</title>
+    <style>
+        /* 全局样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #D6DEEB 40%, #F8F6F6 60%);
+            overflow: hidden;
+        }
+
+        /* 左侧面板 */
+        .left-panel {
+            flex: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #D6DEEB;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel h1 {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 6rem;
+            color: #132843;
+            margin: 0;
+            white-space: nowrap;
+            animation: fadeIn 1.2s ease-in-out;
+            position: relative;
+        }
+
+        .left-panel h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 0;
+            height: 4px;
+            background-color: #132843;
+            animation: lineGrow 1.5s ease-in-out forwards;
+            animation-delay: 0.8s;
+        }
+
+        /* 右侧面板 */
+        .right-panel {
+            flex: 6;
+            position: relative;
+            background-color: #F8F6F6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .right-panel::before {
+            content: '';
+            position: absolute;
+            left: -50px;
+            top: 0;
+            bottom: 0;
+            width: 100px;
+            background: linear-gradient(to right, 
+                #D6DEEB 0%, 
+                #F8F6F6 100%
+            );
+            border-radius: 0 100% 100% 0;
+            box-shadow: 5px 0 15px rgba(19,40,67,0.12);
+        }
+
+        /* 右侧标题 */
+        .right-panel h2 {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 4rem;
+            margin: 0;
+            color: #132843;
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        /* 信息框样式 */
+        .info-box {
+            width: 60%;
+            padding: 18px 0;
+            margin: 20px 0;
+            border: none;
+            border-bottom: 2px solid #6191D3;
+            font-size: 1.2rem;
+            color: #132843;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeInUp 1s ease-in-out;
+            animation-fill-mode: both;
+        }
+
+        .info-box:nth-of-type(1) {
+            animation-delay: 0.2s;
+        }
+
+        .info-box:nth-of-type(2) {
+            animation-delay: 0.4s;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #132843;
+        }
+
+        .info-value {
+            color: #132843;
+        }
+
+        /* 登录按钮样式 */
+        .right-panel button {
+            width: 60%;
+            padding: 15px 0;
+            margin: 25px 0;
+            background-color: #6191D3;
+            border: none;
+            color: #F8F6F6;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-in-out;
+            animation-delay: 0.6s;
+            animation-fill-mode: both;
+        }
+
+        .right-panel button:hover {
+            background-color: #3966A2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(57, 102, 162, 0.24);
+        }
+
+        .right-panel button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(57, 102, 162, 0.24);
+        }
+
+        .right-panel button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(248, 246, 246, 0.55);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .right-panel button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        /* 成功图标 */
+        .success-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #3966A2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #F8F6F6;
+            font-size: 30px;
+            opacity: 0;
+            animation: popIn 0.5s ease-out forwards;
+            animation-delay: 1.5s;
+            box-shadow: 0 5px 15px rgba(57, 102, 162, 0.24);
+        }
+
+        /* 动画定义 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes lineGrow {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* 免责声明样式 */
+        .disclaimer {
+            background-color: #F8F6F6;
+            border-left: 3px solid #3966A2;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #3966A2;
+            border-radius: 0 3px 3px 0;
+            width: 60%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-panel">
+        <h1>03 注册成功</h1>
+    </div>
+    <div class="right-panel">
+        <h2>SUCCESS</h2>
+        <div class="info-box" id="usernameDisplay">
+            <span class="info-label">账户:</span>
+            <span class="info-value">loading...</span>
+        </div>
+        <div class="info-box" id="passwordDisplay">
+            <span class="info-label">密码:</span>
+            <span class="info-value">******</span>
+        </div>
+        <button onclick="window.location.href='{{ url_for('auth.login') }}'">登录</button>
+        <div class="success-icon">✓</div>
+        <div class="disclaimer">
+            **免责声明**：本平台提供的内容仅供参考，可能不准确、不完整或具有误导性。用户应自行核实信息，并在必要时咨询专业人士的意见。
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username') || '未获取到用户名';
+            
+            // 只显示用户名，不显示密码的值
+            document.querySelector('#usernameDisplay .info-value').innerText = username;
+        });
+    </script>
+</body>
+</html>

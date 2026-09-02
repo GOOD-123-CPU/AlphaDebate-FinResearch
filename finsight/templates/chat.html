@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>finsightpro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <style>
+        :root {
+            /* 全新配色体系 */
+            --bg: #F8F6FF;
+            --bg-soft: rgba(248, 246, 255, 0.85);
+            --panel: rgba(255, 255, 255, 0.95);
+            --panel-strong: rgba(255, 255, 255, 0.98);
+            --line: #D6DEEB;
+            --text: #132843;
+            --text-soft: #3966A2;
+            --primary: #3966A2;
+            --primary-deep: #132843;
+            --primary-soft: rgba(97, 145, 211, 0.15);
+            --green: #3CB371;
+            --yellow: #FFB800;
+            --red: #FF4D4F;
+            --shadow: 0 14px 34px rgba(19, 40, 67, 0.08);
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            /* 蓝色系背景渐变 */
+            background:
+                radial-gradient(circle at 18% 12%, rgba(97, 145, 211, 0.15), transparent 24%),
+                radial-gradient(circle at 88% 10%, rgba(214, 222, 235, 0.6), transparent 22%),
+                linear-gradient(180deg, #F8F6FF 0%, #E8EEF8 52%, #D6DEEB 100%);
+        }
+
+        button, input, textarea {
+            font: inherit;
+        }
+
+        .app-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 360px minmax(0, 1fr);
+            grid-template-rows: 88px minmax(0, 1fr);
+        }
+
+        .topbar {
+            grid-column: 1 / -1;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(248, 246, 255, 0.92);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 6px 20px rgba(19, 40, 67, 0.04);
+        }
+
+        .brand {
+            min-width: 246px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 46px;
+            height: 46px;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 8px 18px rgba(57, 102, 162, 0.18));
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .brand-sub {
+            margin-top: 4px;
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .top-search {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 54px;
+            padding: 0 16px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .top-search input {
+            flex: 1;
+            border: 0;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .top-search input::placeholder {
+            color: #8FA1BC;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-chip,
+        .logout-btn,
+        .top-search button,
+        .tab-btn,
+        .mini-tag,
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.74);
+            color: var(--text);
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.18s ease;
+        }
+
+        /* 主按钮蓝色渐变 */
+        .top-search button,
+        .tab-btn.is-active,
+        .nav-chip.is-active,
+        .action-btn.is-primary,
+        .generate-btn {
+            background: linear-gradient(135deg, #6191D3, #3966A2 70%, #132843 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 10px 22px rgba(57, 102, 162, 0.18);
+        }
+
+        .top-search button:hover,
+        .tab-btn:hover,
+        .nav-chip:hover,
+        .action-btn:hover,
+        .generate-btn:hover,
+        .question-area button:hover {
+            transform: translateY(-1px);
+        }
+
+        .sidebar {
+            min-height: 0;
+            padding: 18px;
+            border-right: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(248, 246, 255, 0.92), rgba(214, 222, 235, 0.96));
+        }
+
+        .sidebar-card,
+        .summary-card,
+        .status-row,
+        .tabs-card,
+        .panel-card,
+        .overview-card,
+        .legacy-log {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-card {
+            height: calc(100vh - 124px);
+            display: flex;
+            flex-direction: column;
+            padding: 18px;
+        }
+
+        .selection-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .selector {
+            position: relative;
+        }
+
+        .selector label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .selector input,
+        .selector .custom-select,
+        .question-area textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.82);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .selector input:focus,
+        .selector .custom-select:hover,
+        .question-area textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .custom-select {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            min-height: 50px;
+        }
+
+        .custom-select:after {
+            content: '▼';
+            font-size: 12px;
+            color: var(--text-soft);
+            margin-left: 10px;
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: 100%;
+            max-height: 230px;
+            overflow-y: auto;
+            background: rgba(255,255,255,0.98);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: 0 12px 28px rgba(19,40,67,0.12);
+            z-index: 20;
+            display: none;
+        }
+
+        .dropdown-list.active { display: block; }
+        .dropdown-list ul { list-style: none; padding: 6px 0; margin: 0; }
+        .dropdown-list li {
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background-color 0.18s ease;
+        }
+
+        .dropdown-list li:hover,
+        .dropdown-list li.selected {
+            background: var(--primary-soft);
+        }
+
+        .no-results {
+            padding: 14px;
+            text-align: center;
+            color: var(--text-soft);
+        }
+
+        .generate-btn {
+            width: 100%;
+            min-height: 50px;
+            border: 0;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .generate-btn:disabled,
+        .question-area button:disabled,
+        .action-btn:disabled {
+            background: #B0C4DE;
+            color: #fff;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-stocks-card {
+            flex: 1;
+            min-height: 0;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.60);
+            padding: 14px 14px 10px;
+            overflow: auto;
+        }
+
+        .quick-stocks-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .quick-stock-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .quick-stock-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            color: var(--text);
+            border-bottom: 1px dashed var(--line);
+            cursor: pointer;
+        }
+
+        .quick-stock-list li:last-child {
+            border-bottom: 0;
+        }
+
+        .quick-stock-list li:hover {
+            color: var(--primary);
+        }
+
+        .quick-stock-list .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            flex: none;
+        }
+
+        .main-content {
+            position: relative;
+            min-width: 0;
+            min-height: 0;
+            padding: 18px 18px 22px;
+            overflow: auto;
+        }
+
+        .main-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .main-head h1 {
+            margin: 0;
+            font-size: 24px;
+            line-height: 1.2;
+        }
+
+        .main-head p {
+            margin: 8px 0 0;
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .report-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .action-btn {
+            min-height: 40px;
+            background: rgba(255,255,255,0.76);
+        }
+
+        .download-menu {
+            position: relative;
+        }
+
+        .download-options {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 156px;
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: rgba(255, 252, 247, 0.98);
+            box-shadow: 0 18px 36px rgba(19,40,67,0.12);
+            display: none;
+            z-index: 30;
+        }
+
+        .download-options.is-open {
+            display: grid;
+            gap: 6px;
+        }
+
+        .download-option-btn {
+            width: 100%;
+            min-height: 38px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.78);
+            color: var(--text);
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .download-option-btn:hover {
+            background: var(--primary-soft);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .summary-card {
+            padding: 18px 18px 16px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(248,246,255,0.96));
+            min-height: 164px;
+        }
+
+        .summary-label {
+            color: var(--text-soft);
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 15px;
+            line-height: 1.6;
+            font-weight: 700;
+            min-height: 72px;
+            max-height: 7.2em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+        }
+
+        .summary-value.is-risk { color: var(--red); }
+        .summary-value.is-status { color: var(--text-soft); }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            background: rgba(252,248,243,0.94);
+        }
+
+        .status-left {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .mini-tag {
+            min-height: 30px;
+            padding: 0 12px;
+            font-size: 12px;
+        }
+
+        /* 状态标签配色 */
+        .mini-tag.is-green { color: var(--green); background: rgba(60, 179, 113, 0.12); }
+        .mini-tag.is-yellow { color: var(--yellow); background: rgba(255, 184, 0, 0.14); }
+        .mini-tag.is-red { color: var(--red); background: rgba(255, 77, 79, 0.14); }
+
+        .tabs-card {
+            padding: 14px;
+            background: var(--panel);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .tab-btn {
+            background: rgba(255,255,255,0.72);
+            color: var(--text);
+        }
+
+        .tab-panel {
+            display: none;
+            padding-top: 16px;
+        }
+
+        .tab-panel.is-active {
+            display: block;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            color: var(--text-soft);
+            font-size: 12px;
+        }
+
+        .overview-card,
+        .panel-card {
+            padding: 18px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(248,246,255,0.95));
+        }
+
+        .overview-card + .legacy-log,
+        .panel-card + .panel-card {
+            margin-top: 14px;
+        }
+
+        .overview-content,
+        .qa-layout {
+            min-height: 260px;
+        }
+
+        .overview-content p {
+            margin: 0 0 14px;
+            line-height: 1.85;
+        }
+
+        .legacy-log {
+            padding: 14px 16px;
+            background: rgba(248,246,255,0.88);
+        }
+
+        .legacy-log summary {
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-soft);
+        }
+
+        .legacy-log-body {
+            margin-top: 12px;
+            max-height: 240px;
+            overflow: auto;
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(248,246,255,0.86);
+            border: 1px solid var(--line);
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.7;
+            font-size: 13px;
+        }
+
+        .report-content {
+            overflow: auto;
+            line-height: 1.8;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .report-content .report-title {
+            font-size: 1.8rem;
+            color: var(--primary-deep);
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .report-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            background-color: rgba(214, 222, 235, 0.2);
+            border-radius: 12px;
+            color: var(--text-soft);
+            font-size: 14px;
+        }
+
+        .markdown-body {
+            font-size: 16px;
+            line-height: 1.7;
+            word-wrap: break-word;
+            padding: 4px;
+        }
+
+        .markdown-body h1,
+        .markdown-body h2,
+        .markdown-body h3 {
+            color: var(--primary-deep);
+        }
+
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: auto;
+        }
+
+        .markdown-body th,
+        .markdown-body td {
+            border: 1px solid var(--line);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .markdown-body pre,
+        .markdown-content pre {
+            background-color: #F5F7FA;
+            padding: 14px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .empty-state {
+            min-height: 220px;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            border: 1px dashed var(--line);
+            border-radius: 16px;
+            background: rgba(248,246,255,0.74);
+            color: var(--text-soft);
+            text-align: center;
+        }
+
+        .qa-layout {
+            display: grid;
+            grid-template-rows: minmax(260px, 1fr) auto;
+            gap: 14px;
+        }
+
+        .chat-history {
+            overflow-y: auto;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background-color: rgba(255,255,255,0.74);
+        }
+
+        .chat-bubble {
+            margin-bottom: 15px;
+            max-width: 88%;
+            line-height: 1.6;
+        }
+
+        /* 对话气泡蓝色渐变 */
+        .chat-bubble.user {
+            margin-left: auto;
+            background: linear-gradient(135deg, #6191D3, #3966A2 70%, #132843 100%);
+            color: #fff;
+            border-radius: 16px 16px 4px 16px;
+            padding: 10px 14px;
+        }
+
+        .chat-bubble.ai {
+            background-color: rgba(248,246,255,0.96);
+            border: 1px solid var(--line);
+            border-radius: 16px 16px 16px 4px;
+            padding: 10px 14px;
+        }
+
+        .thinking-process {
+            background-color: #F5F7FA;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .markdown-content {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        .message-content p:last-child { margin-bottom: 0; }
+
+        .question-area {
+            padding: 0;
+            background: transparent;
+        }
+
+        .question-area textarea {
+            min-height: 100px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .question-area button {
+            width: 100%;
+            min-height: 48px;
+            border: 0;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #6191D3, #3966A2 70%, #132843 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 22px rgba(57, 102, 162, 0.16);
+        }
+
+        .loader-container {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(255, 255, 255, 0.86);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 50;
+            backdrop-filter: blur(3px);
+        }
+
+        /* 加载动画蓝色 */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            animation: spin 1.2s linear infinite;
+            margin-bottom: 18px;
+        }
+
+        .loader-text {
+            color: var(--text);
+            font-size: 1.05rem;
+            text-align: center;
+            max-width: 80%;
+            margin-bottom: 14px;
+        }
+
+        .cancel-btn {
+            padding: 8px 16px;
+            background-color: var(--red);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .uncertainty-mark {
+            color: var(--red);
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .uncertainty-mark:hover::after {
+            content: '此内容可能不准确或不完整，请自行核实。';
+            position: absolute;
+            background-color: #fff0f0;
+            color: var(--red);
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #ffcccc;
+            font-size: 12px;
+            white-space: nowrap;
+            top: 0;
+            left: 100%;
+            margin-left: 5px;
+            z-index: 10;
+        }
+
+        .disclaimer {
+            background-color: #F8F6FF;
+            border-left: 3px solid var(--red);
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-soft);
+            border-radius: 0 3px 3px 0;
+        }
+
+        @media print {
+            body {
+                background: #fff !important;
+            }
+
+            .topbar,
+            .sidebar,
+            .summary-grid,
+            .status-row,
+            .tabs,
+            .report-actions,
+            .legacy-log,
+            .loader-container {
+                display: none !important;
+            }
+
+            .app-shell {
+                display: block;
+                min-height: auto;
+            }
+
+            .main-content {
+                padding: 0;
+                overflow: visible;
+            }
+
+            .main-head {
+                margin-bottom: 12px;
+            }
+
+            #overviewTab,
+            #chartsTab,
+            #qaTab {
+                display: none !important;
+            }
+
+            #fulltextTab {
+                display: block !important;
+                padding-top: 0;
+            }
+
+            .tabs-card,
+            .panel-card,
+            .report-content {
+                box-shadow: none !important;
+                border: 0 !important;
+                background: #fff !important;
+                padding: 0 !important;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1280px) {
+            .app-shell {
+                grid-template-columns: 330px minmax(0, 1fr);
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(220px, 1fr));
+            }
+        }
+
+        @media (max-width: 980px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto minmax(0, 1fr);
+            }
+            .sidebar {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+            .sidebar-card {
+                height: auto;
+                min-height: 480px;
+            }
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .selection-container {
+                grid-template-columns: 1fr;
+            }
+            .topbar {
+                flex-wrap: wrap;
+                align-items: stretch;
+            }
+            .brand, .top-search, .top-actions {
+                width: 100%;
+            }
+        }
+
+        /* ---------- 深度升级新增组件 ---------- */
+        .chart-container {
+            width: 100%;
+            height: 380px;
+            margin-top: 14px;
+        }
+
+        .chart-container-sm {
+            height: 300px;
+        }
+
+        .chart-meta-row,
+        .debate-meta-row {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: var(--primary-soft);
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .debate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .debate-card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 14px 16px;
+        }
+
+        .debate-card.is-winner {
+            border-color: var(--green);
+            box-shadow: 0 8px 22px rgba(60, 179, 113, 0.16);
+        }
+
+        .debate-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .debate-card-title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .debate-score {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .debate-role {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: var(--primary-soft);
+            color: var(--text-soft);
+        }
+
+        .debate-role.is-bull { background: rgba(255, 77, 79, 0.12); color: #C0392B; }
+        .debate-role.is-bear { background: rgba(60, 179, 113, 0.14); color: #1E8449; }
+
+        .debate-list {
+            margin: 6px 0 0;
+            padding-left: 18px;
+            color: var(--text-soft);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .debate-list-title {
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.85);
+            cursor: pointer;
+            transition: 0.18s ease;
+        }
+
+        .history-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .history-item-main {
+            min-width: 0;
+        }
+
+        .history-item-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-item-sub {
+            margin-top: 4px;
+            color: var(--text-soft);
+            font-size: 12px;
+        }
+
+        .history-score {
+            flex: none;
+            min-width: 56px;
+            text-align: center;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: var(--primary-soft);
+            color: var(--primary-deep);
+            font-weight: 700;
+        }
+
+        .history-empty {
+            padding: 28px;
+            text-align: center;
+            color: var(--text-soft);
+        }
+
+        .app-footer {
+            margin-top: 20px;
+            padding: 14px 18px;
+            border-top: 1px solid var(--line);
+            color: var(--text-soft);
+            font-size: 12px;
+            line-height: 1.7;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand">
+                <img class="brand-logo" src="{{ url_for('static', filename='logo/logo2.png') }}" alt="finsightpro logo">
+                <div>
+                    <div class="brand-title">finsightpro</div>
+                    <div class="brand-sub">智能研报分析与阅读</div>
+                </div>
+            </div>
+            <div class="top-search">
+                <span>⌕</span>
+                <input type="text" id="topSearchInput" placeholder="输入股票代码 / 公司名称">
+                <button type="button" id="topSearchBtn">搜索</button>
+            </div>
+            <div class="top-actions">
+                <button type="button" class="nav-chip is-active" data-nav-target="overviewTab">概览</button>
+                <button type="button" class="nav-chip" data-nav-target="fulltextTab">全文</button>
+                <button type="button" class="nav-chip" data-nav-target="chartTab">行情图表</button>
+                <button type="button" class="nav-chip" data-nav-target="debateTab">辩论过程</button>
+                <button type="button" class="nav-chip" data-nav-target="historyTab">历史报告</button>
+                <button type="button" class="nav-chip" data-nav-target="qaTab">问答</button>
+                <a class="logout-btn" href="/logout">退出登录</a>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <section class="sidebar-card" id="stockPanel">
+                <div class="selection-container">
+                    <div class="selector" id="companySelector">
+                        <label>股票选择</label>
+                        <div class="selector-header">
+                            <input type="text" id="companySearchBox" placeholder="搜索或选择股票..." autocomplete="off">
+                        </div>
+                        <div class="dropdown-list" id="companyDropdown">
+                            <ul id="companyList">
+                                <li data-code="600519.SS" data-name="贵州茅台">贵州茅台 (600519.SS)</li>
+                                <li data-code="000858.SZ" data-name="五粮液">五粮液 (000858.SZ)</li>
+                                <li data-code="601318.SS" data-name="中国平安">中国平安 (601318.SS)</li>
+                                <li data-code="300750.SZ" data-name="宁德时代">宁德时代 (300750.SZ)</li>
+                                <li data-code="688981.SS" data-name="中芯国际">中芯国际 (688981.SS)</li>
+                                <li data-code="600036.SS" data-name="招商银行">招商银行 (600036.SS)</li>
+                                <li data-code="601398.SS" data-name="工商银行">工商银行 (601398.SS)</li>
+                                <li data-code="600276.SS" data-name="恒瑞医药">恒瑞医药 (600276.SS)</li>
+                                <li data-code="601899.SS" data-name="紫金矿业">紫金矿业 (601899.SS)</li>
+                                <li data-code="600030.SS" data-name="中信证券">中信证券 (600030.SS)</li>
+                            </ul>
+                            <div class="no-results" id="companyNoResults" style="display:none;">无匹配结果</div>
+                        </div>
+                    </div>
+
+                    <div class="selector" id="functionSelector">
+                        <label>分析功能</label>
+                        <div class="selector-header">
+                            <div class="custom-select" id="functionSelectBox">选择分析功能</div>
+                        </div>
+                        <div class="dropdown-list" id="functionDropdown">
+                            <ul id="functionList">
+                                <li data-value="股票分析报告">股票分析报告</li>
+                                <li data-value="前景分析">前景分析</li>
+                                <li data-value="风险预测">风险预测</li>
+                                <li data-value="行业市场分析">行业市场分析</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="generate-btn" id="generateBtn" onclick="generateReport()" disabled>生成分析报告</button>
+
+                <div class="quick-stocks-card">
+                    <div class="quick-stocks-title">常用股票</div>
+                    <ul class="quick-stock-list" id="quickStockList"></ul>
+                </div>
+            </section>
+        </aside>
+
+        <main class="main-content">
+            <div class="main-head">
+                <div>
+                    <h1 id="reportTitle">finsightpro 分析报告</h1>
+                    <p id="reportSubTitle">请选择股票和分析功能后开始生成报告，报告生成后可在下方按标签查看。</p>
+                </div>
+                <div class="report-actions">
+                    <button type="button" class="action-btn is-primary" onclick="generateReport(true)">重新生成</button>
+                    <button type="button" class="action-btn" onclick="printReport()">打印报告</button>
+                    <div class="download-menu">
+                        <button type="button" class="action-btn" onclick="toggleDownloadMenu(event)">下载报告</button>
+                        <div class="download-options" id="downloadOptions">
+                            <button type="button" class="download-option-btn" onclick="downloadReport('pdf')">下载 PDF</button>
+                            <button type="button" class="download-option-btn" onclick="downloadReport('word')">下载 Word</button>
+                            <button type="button" class="download-option-btn" onclick="downloadReport('markdown')">下载 Markdown</button>
+                            <button type="button" class="download-option-btn" onclick="downloadReport('txt')">下载 TXT</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">报告摘要</div>
+                    <div class="summary-value" id="summaryAbstract">欢迎使用智能分析平台，请先在左侧选择股票与分析功能。</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">核心结论</div>
+                    <div class="summary-value" id="summaryConclusion">报告生成后，这里会显示自动提炼的核心观点。</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">风险提示</div>
+                    <div class="summary-value is-risk" id="summaryRisk">需结合原始报告与实时行情进一步确认。</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">运行状态</div>
+                    <div class="summary-value is-status" id="summaryStatus">等待操作</div>
+                </div>
+            </section>
+
+            <section class="status-row">
+                <div class="status-left">
+                    <span class="mini-tag is-green" id="statusTone">轻量状态</span>
+                    <span class="mini-tag" id="statusText">等待操作</span>
+                    <span class="mini-tag">日志区已折叠为状态提示</span>
+                </div>
+                <div class="section-subtitle">原始运行日志仍会保留在概览标签中，可展开查看。</div>
+            </section>
+
+            <section class="tabs-card">
+                <div class="tabs">
+                    <button type="button" class="tab-btn is-active" data-tab-target="overviewTab">概览</button>
+                    <button type="button" class="tab-btn" data-tab-target="fulltextTab">全文</button>
+                    <button type="button" class="tab-btn" data-tab-target="chartTab">行情图表</button>
+                    <button type="button" class="tab-btn" data-tab-target="debateTab">辩论过程</button>
+                    <button type="button" class="tab-btn" data-tab-target="historyTab">历史报告</button>
+                    <button type="button" class="tab-btn" data-tab-target="qaTab">问答记录</button>
+                </div>
+
+                <section class="tab-panel is-active" id="overviewTab">
+                    <div class="overview-card">
+                        <div class="section-head">
+                            <div>
+                                <div class="section-title">报告概览</div>
+                                <div class="section-subtitle">适合先浏览核心内容，再进入全文与问答</div>
+                            </div>
+                        </div>
+                        <div class="overview-content" id="overviewContent">
+                            <p>欢迎使用智能分析平台，请先在左侧选择公司和分析功能，然后点击“生成分析报告”按钮开始分析。</p>
+                            <p>系统将为您生成详细报告。报告生成后，您可以在“问答记录”标签中继续追问报告内容。</p>
+                            <p><strong>免责声明：</strong>本平台提供的内容仅供参考，可能不准确、不完整或具有误导性。用户应自行核实信息，并在必要时咨询专业人士的意见。</p>
+                        </div>
+                    </div>
+
+                    <details class="legacy-log">
+                        <summary>查看详细日志</summary>
+                        <div class="legacy-log-body" id="detailLogContent">页面已加载，等待生成报告。</div>
+                    </details>
+                </section>
+
+                <section class="tab-panel" id="fulltextTab">
+                    <div class="panel-card">
+                        <div class="section-head">
+                            <div>
+                                <div class="section-title">报告全文</div>
+                                <div class="section-subtitle">完整正文与表格内容会显示在这里</div>
+                            </div>
+                        </div>
+                        <div class="report-content" id="reportContent">
+                            <div class="empty-state">暂无报告内容，请先生成分析报告。</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="tab-panel" id="chartTab">
+                    <div class="panel-card">
+                        <div class="section-head">
+                            <div>
+                                <div class="section-title">行情图表</div>
+                                <div class="section-subtitle">基于 AkShare 真实行情数据渲染（近 30 个交易日）</div>
+                            </div>
+                            <button type="button" class="action-btn is-primary" onclick="loadChart()">刷新图表</button>
+                        </div>
+                        <div class="chart-meta-row" id="chartMeta">请先在左侧选择股票，图表将自动加载该股真实行情。</div>
+                        <div class="chart-container" id="klineChart"></div>
+                        <div class="chart-container chart-container-sm" id="volumeChart"></div>
+                    </div>
+                </section>
+
+                <section class="tab-panel" id="debateTab">
+                    <div class="panel-card">
+                        <div class="section-head">
+                            <div>
+                                <div class="section-title">辩论过程</div>
+                                <div class="section-subtitle">多空对抗辩论全透明：双生成器四稿评分、胜者与评审意见</div>
+                            </div>
+                        </div>
+                        <div class="debate-meta-row" id="debateMeta">暂无辩论数据。生成报告后，这里将展示多空双方的完整对抗过程。</div>
+                        <div id="radarChart" class="chart-container chart-container-sm"></div>
+                        <div class="debate-grid" id="debateGrid"></div>
+                    </div>
+                </section>
+
+                <section class="tab-panel" id="historyTab">
+                    <div class="panel-card">
+                        <div class="section-head">
+                            <div>
+                                <div class="section-title">历史报告中心</div>
+                                <div class="section-subtitle">所有已生成的报告及其最终评分，点击即可回看</div>
+                            </div>
+                            <button type="button" class="action-btn" onclick="loadReportHistory()">刷新列表</button>
+                        </div>
+                        <div class="history-list" id="historyList">加载中...</div>
+                    </div>
+                </section>
+
+                <section class="tab-panel" id="qaTab">
+                    <div class="panel-card">
+                        <div class="section-head">
+                            <div>
+                                <div class="section-title">问答记录</div>
+                                <div class="section-subtitle">报告生成后，可在这里围绕报告继续提问</div>
+                            </div>
+                        </div>
+                        <div class="qa-layout">
+                            <div class="chat-history" id="chatHistory">
+                                <div id="chatBox"></div>
+                            </div>
+                            <div class="question-area">
+                                <textarea id="questionInput" placeholder="请输入您关于报告的问题..." disabled></textarea>
+                                <button id="submitBtn" onclick="submitQuestion()" disabled>提交问题</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <div class="loader-container" id="loaderContainer">
+                <div class="loader"></div>
+                <div class="loader-text">正在生成分析报告，请稍候...</div>
+                <button onclick="cancelCurrentRequest()" class="cancel-btn">取消</button>
+            </div>
+
+            <footer class="app-footer">
+                本平台内容由 AI 基于公开市场数据自动生成，仅供技术研究与学习参考，
+                不构成任何证券投资建议。市场有风险，投资需谨慎。
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>

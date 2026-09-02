@@ -1,0 +1,16 @@
+# Core web framework（本仓库在以下版本实测通过）
+Flask>=3.0,<4
+Flask-SQLAlchemy>=3.1,<4
+Werkzeug>=3.0
+python-dotenv>=1.0
+
+# Data processing and financial data sources
+pandas>=2.0
+akshare>=1.14
+
+# Note: Markdown rendering happens client-side (marked.js), no server dep needed.
+# Tests: pip install pytest
+
+# ---------- Optional extras ----------
+# GPU fine-tuning (finetune/): torch, transformers, datasets, trl, unsloth, modelscope, bitsandbytes, peft
+# Production server (Linux): gunicorn ; (Windows): waitress
