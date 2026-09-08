@@ -4,7 +4,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
-![CI](https://img.shields.io/badge/CI-pytest%20%C3%97%20pytest-success)
+[![CI](https://github.com/GOOD-123-CPU/AlphaDebate-FinResearch/actions/workflows/ci.yml/badge.svg)](https://github.com/GOOD-123-CPU/AlphaDebate-FinResearch/actions/workflows/ci.yml)
 ![Flask](https://img.shields.io/badge/Flask-3.x-green)
 
 > ⚠️ **免责声明**：本项目及由本项目生成的所有内容仅供技术研究与学习参考，
@@ -61,7 +61,7 @@ flowchart LR
 
 ```bash
 git clone https://github.com/GOOD-123-CPU/AlphaDebate-FinResearch.git
-cd finsightpro
+cd AlphaDebate-FinResearch
 pip install -r requirements.txt
 
 # 配置
@@ -125,7 +125,7 @@ Generator A  Generator B     ← 第二轮：吸收评审 + 正面反驳对手�
      Judge 终评 → 择优输出 → 流式渲染 + 辩论面板 + 报告追问
 ```
 
-任一环节失败均有降级方案（结构化数据回退报告），保证接口始终可用。
+部分失败场景提供结构化数据回退报告；实际可用性仍受上游数据源、模型服务和运行环境影响。
 
 ## 🔬 微调复现
 
