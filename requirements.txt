@@ -5,7 +5,7 @@ Werkzeug>=3.0
 python-dotenv>=1.0
 
 # Data processing and financial data sources
-pandas>=2.0
+pandas>=3.0.5
 akshare>=1.14
 
 # Note: Markdown rendering happens client-side (marked.js), no server dep needed.
