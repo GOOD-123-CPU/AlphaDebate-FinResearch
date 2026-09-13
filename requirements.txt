@@ -6,7 +6,7 @@ python-dotenv>=1.0
 
 # Data processing and financial data sources
 pandas>=2.0
-akshare>=1.14
+akshare>=1.18.94
 
 # Note: Markdown rendering happens client-side (marked.js), no server dep needed.
 # Tests: pip install pytest
